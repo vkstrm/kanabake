@@ -110,6 +110,7 @@ pub fn hiragana() -> HashMap<&'static str, &'static str> {
     map.insert("WA","わ");
     map.insert("WO","を");
     map.insert("N","ん");
+    map.insert("LTSU","っ");
     map
 }
 
@@ -223,6 +224,6 @@ pub fn katakana() -> HashMap<&'static str, &'static str> {
     map.insert("WA","ワ");
     map.insert("WO","ヲ");
     map.insert("N","ン");
-    map.insert("ltsu","ッ");
+    map.insert("LTSU","ッ");
     map
 }

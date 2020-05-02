@@ -117,6 +117,11 @@ fn length_two(input: &str, allowed_head: &Vec<&str>, allowed_tail: &Vec<&str>) -
     let token = token_to_tuple(&input[..2], 1);
     let remain = &input[2..];
 
+    // TODO Check if allowed character as well
+    if &token.0 == &token.1 {
+        return as_opt_str_tuple("LTSU", &input[1..])
+    }
+
     if allowed_head.contains(&token.0) && allowed_tail.contains(&token.1) {
         return as_opt_str_tuple(&input[..2], remain)
     }
