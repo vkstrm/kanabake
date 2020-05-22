@@ -1,36 +1,61 @@
-use std::env;
+use std::io;
+use std::io::prelude::*;
+use clap::{Arg, App};
+
 mod sets;
 mod tokens;
 
-struct Args {
-    input: String,
-    katakana: bool
-}
 
 fn main() {
-    // TODO Proper argument parsing
-    // TODO STDIN input
-    let args: Vec<_> = env::args().collect();
-    let p_args = check_args(&args);
-    let parsed_args: Args;
-    if let Some(p) = p_args {
-        parsed_args = p;
-    } else {
-        println!("usuage: kana <sentence>
-        Transform letters to hiragana (default) or katakana (with flag -k)");
-        return
+    let matches = App::new("kana")
+        .version("1.0")
+        .about("Turn letters into kana")
+        .arg(
+            Arg::with_name("input")
+                .about("The word to transform")
+                .required(true)
+                .index(1)
+                .conflicts_with("stdin")
+        )
+        .arg(
+            Arg::with_name("stdin")
+                .short('s')
+                .long("stdin")
+                .about("Use stdin for input")
+                .takes_value(false)
+        )
+        .arg(
+            Arg::with_name("katakana")
+                .short('k')
+                .long("katakana")
+                .about("Output as katakana")
+                .takes_value(false)
+        )
+        .get_matches();
+
+    let mut inputs: Vec<String> = Vec::new();
+    if let Some(i) = matches.value_of("input") {
+        inputs.push(String::from(i).to_ascii_uppercase());
     }
 
+    match matches.occurrences_of("stdin") {
+        1 => from_stdin(&mut inputs),
+        _ => {} 
+    }
+
+    // validate_input(&inputs);
+    
     let hiragana_set = sets::hiragana();
     let katakana_set = sets::katakana();
     let mut set: &std::collections::HashMap<&str,&str> = &hiragana_set;
-    if parsed_args.katakana {
-        set = &katakana_set;
+    match matches.occurrences_of("katakana") {
+        1 => set = &katakana_set,
+        _ => {}
     }
 
-    let input_str: &String = &parsed_args.input;
-    let input = input_str.to_ascii_uppercase();
-    transform(&set, &input);
+    for input in inputs {
+        transform(&set, &input);
+    }
 }
 
 /**
@@ -48,32 +73,18 @@ fn transform(set: &std::collections::HashMap<&str, &str>, input: &String) {
 }
 
 /**
- * Check if arguments are good and what flag and whatnot.
- * Maybe unnessecary now but good sometime.
+ * Collect input from standard in
  */
-fn check_args(args: &Vec<String>) -> std::option::Option<Args> {
-    let mut k_mode = false;
-    let k_flag_short = String::from("-k");
-    let k_flag_long = String::from("--katakana");
-
-    if args.len() == 1 { return None; }
-
-    if args.contains(&k_flag_short) || args.contains(&k_flag_long) {
-        k_mode = true;
+fn from_stdin(input_vec: &mut Vec<String>) {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        input_vec.push(line.unwrap().to_ascii_uppercase());
     }
-
-    // TODO Check with regex if input is OK
-    
-    let input_str: &String = &args[1];
-    if !input_str.is_ascii() {
-        println!("No weird letters please");
-        return None
-    }
-
-    let args = Args{
-        katakana: k_mode,
-        input: input_str.to_owned()
-    };
-
-    Some(args)
 }
+
+// /**
+//  * Check that no input string contains any illegal characters
+//  */
+// fn validate_input(input: & Vec<String>) {
+//     return
+// }
