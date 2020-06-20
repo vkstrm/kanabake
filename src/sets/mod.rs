@@ -36,6 +36,9 @@ pub fn hiragana() -> HashMap<&'static str, &'static str> {
     map.insert("JA","じゃ");
     map.insert("JU","じゅ");
     map.insert("JO","じょ");
+    map.insert("JYA","じゃ");
+    map.insert("JYU","じゅ");
+    map.insert("JYO","じょ");
     map.insert("ZU","ず");
     map.insert("ZE","ぜ");
     map.insert("ZO","ぞ");
@@ -150,6 +153,9 @@ pub fn katakana() -> HashMap<&'static str, &'static str> {
     map.insert("JA","ジャ");
     map.insert("JU","ジュ");
     map.insert("JO","ジョ");
+    map.insert("JYA","ジャ");
+    map.insert("JYU","ジュ");
+    map.insert("JYO","ジョ");
     map.insert("ZU","ズ");
     map.insert("ZE","ゼ");
     map.insert("ZO","ゾ");

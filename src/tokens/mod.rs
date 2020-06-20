@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 type OptStrTuple = std::option::Option<(String, String)>;
 
-pub fn intepret_tokens(input: &String) -> Vec<String> {
+pub fn interpret_tokens(input: &String) -> Vec<String> {
     let allowed_map = get_allowed_map();    
     let allowed_head = vec!["K","G","S","Z","T","D","J","N","H","B","P","F","M","Y","R","W"];
     let allowed_base = vec!["A","I","U","E","O"];
@@ -53,6 +53,7 @@ fn get_allowed_map() -> HashMap<&'static str, Vec<&'static str>> {
     map.insert("DZ", vec!["U"]);
     map.insert("NY", vec!["A","U","O"]);
     map.insert("DY", vec!["A","U","O"]);
+    map.insert("JY", vec!["A","U","O"]);
     map.insert("RY", vec!["A","U","O"]);
     map.insert("HY", vec!["A","U","O"]);
     map.insert("BY", vec!["A","U","O"]);
@@ -117,8 +118,7 @@ fn length_two(input: &str, allowed_head: &Vec<&str>, allowed_tail: &Vec<&str>) -
     let token = token_to_tuple(&input[..2], 1);
     let remain = &input[2..];
 
-    // TODO Check if allowed character as well
-    if &token.0 == &token.1 {
+    if &token.0 == &token.1 && allowed_head.contains(&token.0)  {
         return as_opt_str_tuple("LTSU", &input[1..])
     }
 
@@ -146,4 +146,12 @@ fn length_three(input: &str, allowed_map: &HashMap<&str, Vec<&str>>) -> OptStrTu
     }
 
     None
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn placeholder() {
+        assert_eq!(1, 1);
+    }
 }

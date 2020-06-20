@@ -2,8 +2,7 @@ use std::io;
 use std::io::prelude::*;
 use clap::{Arg, App};
 
-mod sets;
-mod tokens;
+extern crate kana;
 
 
 fn main() {
@@ -44,32 +43,14 @@ fn main() {
     }
 
     // validate_input(&inputs);
-    
-    let hiragana_set = sets::hiragana();
-    let katakana_set = sets::katakana();
-    let mut set: &std::collections::HashMap<&str,&str> = &hiragana_set;
+
+    let mut katakana: bool = false;
     match matches.occurrences_of("katakana") {
-        1 => set = &katakana_set,
+        1 => katakana = true,
         _ => {}
     }
-
-    for input in inputs {
-        transform(&set, &input);
-    }
-}
-
-/**
- * Turn input into kana and print
- */
-fn transform(set: &std::collections::HashMap<&str, &str>, input: &String) {
-    let token_input = tokens::intepret_tokens(&input);
-    let mut output = String::with_capacity(token_input.len() * 2);
-
-    for token in token_input {
-        output.push_str(set.get(&token.as_str()).expect("No such token in map"));
-    }
-
-    println!("{}",output);
+    
+    kana::transform(&katakana, &inputs);
 }
 
 /**
