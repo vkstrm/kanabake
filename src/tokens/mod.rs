@@ -96,9 +96,6 @@ fn length_one(input: &str, allowed_post_n: &Vec<&str>, allowed_base: &Vec<&str>)
             return as_opt_str_tuple(token, remain);
         }
         let r = &remain[..1];
-        if r == "^" {
-            return as_opt_str_tuple(token, &input[..2]);
-        }
         if allowed_post_n.contains(&r) {
             return as_opt_str_tuple(token,remain);
         }
