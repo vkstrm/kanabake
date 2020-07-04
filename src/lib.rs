@@ -1,25 +1,34 @@
-mod tokens;
 mod sets;
+mod tokens;
+mod word;
+
+use std::collections::HashMap;
 
 /**
  * Turn input into kana and print
  */
-pub fn transform(katakana_mode: &bool, input_vec: &Vec<String>) {
+pub fn transform(katakana_mode: &bool, input_vec: Vec<String>) {
     let hiragana_set = sets::hiragana();
     let katakana_set = sets::katakana();
-    let mut set: &std::collections::HashMap<&str,&str> = &hiragana_set;
+    let mut set: &HashMap<&str,&str> = &hiragana_set;
     if *katakana_mode {
         set = &katakana_set;
     }
 
-    for input in input_vec {
-        let token_input = tokens::interpret_tokens(&input);
-        let mut output = String::with_capacity(token_input.len() * 2);
+    let mut words = word::init_word_collection(input_vec);
+    set_tokens(&mut words);
+    word::set_kana(&mut words, &set);
 
-        for token in token_input {
-            output.push_str(set.get(&token.as_str()).expect("No such token in map"));
-        }
+    for word in words {
+        println!("{}",word.kana);
+    }
+}
 
-        println!("{}",output);
+/**
+ * Set the token field in a collection of words
+ */
+pub fn set_tokens(words: &mut Vec<word::Word>) {
+    for word in words {
+        word.tokens = tokens::interpret_tokens(&word.original);
     }
 }

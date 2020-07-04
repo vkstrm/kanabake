@@ -42,15 +42,13 @@ fn main() {
         _ => {} 
     }
 
-    // validate_input(&inputs);
-
     let mut katakana: bool = false;
     match matches.occurrences_of("katakana") {
         1 => katakana = true,
         _ => {}
     }
     
-    kana::transform(&katakana, &inputs);
+    kana::transform(&katakana, inputs);
 }
 
 /**
@@ -62,10 +60,3 @@ fn from_stdin(input_vec: &mut Vec<String>) {
         input_vec.push(line.unwrap().to_ascii_uppercase());
     }
 }
-
-// /**
-//  * Check that no input string contains any illegal characters
-//  */
-// fn validate_input(input: & Vec<String>) {
-//     return
-// }
