@@ -1,5 +1,25 @@
 use std::collections::HashMap;
 
+pub enum KanaType {
+    Hiragana,
+    Katakana
+}
+
+pub struct Sets {
+    pub kana_dict: HashMap<&'static str, &'static str>,
+}
+
+impl Sets {
+    pub fn new(set_type: KanaType) -> Sets {
+        Sets {
+            kana_dict: match set_type {
+                KanaType::Hiragana => hiragana(),
+                KanaType::Katakana => katakana(),
+            }
+        }
+    }
+}
+
 pub fn hiragana() -> HashMap<&'static str, &'static str> {
     let mut map = HashMap::new();
     map.insert("A", "あ");
