@@ -5,14 +5,31 @@ mod word;
 type Sets = sets::Sets;
 
 /**
- * Turn input into kana and print
+ * Transform letters to kana and print to stdout
  */
-pub fn transform(katakana_mode: &bool, input_vec: Vec<String>) {
+pub fn transform_to_stdout(katakana_mode: bool, input_vec: Vec<String>) {
+    let words = internal_transform(katakana_mode, input_vec);
+    print(&words);
+}
+
+/**
+ * Transform letters to kana and return result
+ */
+pub fn transform(katakana_mode: bool, input_vec: Vec<String>) -> Vec<String> {
+    let words = internal_transform(katakana_mode, input_vec);
+    let mut return_vec = Vec::new();
+    for word in words {
+        return_vec.push(word.kana);
+    }
+    return_vec
+}
+
+fn internal_transform(katakana_mode: bool, input_vec: Vec<String>) -> Vec<word::Word> {
     let hiragana_set: Sets = Sets::new(sets::KanaType::Hiragana);
     let katakana_set: Sets = Sets::new(sets::KanaType::Katakana);
 
     let builder: WordBuilder;
-    if *katakana_mode {
+    if katakana_mode {
         builder = WordBuilder::new(katakana_set);
     } else {
         builder = WordBuilder::new(hiragana_set);
@@ -24,6 +41,10 @@ pub fn transform(katakana_mode: &bool, input_vec: Vec<String>) {
         builder.transform(word);
     }
 
+    words
+}
+
+fn print(words: &Vec<word::Word>) {
     for word in words {
         println!("{}",word.kana);
     }

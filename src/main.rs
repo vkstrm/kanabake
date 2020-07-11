@@ -48,7 +48,7 @@ fn main() {
         _ => {}
     }
     
-    kana::transform(&katakana, inputs);
+    kana::transform_to_stdout(katakana, inputs);
 }
 
 /**
