@@ -1,12 +1,12 @@
 extern crate kana;
 
 const SINGLE_HIRAGANA: fn(&str) -> String = |input: &str| -> String {
-    let v = kana::transform(false, vec![String::from(input)]);
+    let v = kana::transform(false, &vec![String::from(input)]);
     v[0].to_owned()
 };
 
 const SINGLE_KATAKANA: fn(&str) -> String = |input: &str| -> String {
-    let v = kana::transform(true, vec![String::from(input)]);
+    let v = kana::transform(true, &vec![String::from(input)]);
     v[0].to_owned()
 };
 

@@ -15,6 +15,9 @@ impl Word {
         }
     }
 
+    /**
+     * Turn each token into a character from the passed set
+     */
     pub fn set_kana(&mut self, set: &HashMap<&str,&str>) {
         for token in &self.tokens {
             self.kana.push_str(set.get(&token.as_str()).expect("No such token in map"));
@@ -29,10 +32,10 @@ impl Word {
 /**
  * Return a vector of Words initialised from input
  */
-pub fn init_word_collection(input: Vec<String>) -> Vec<Word> {
+pub fn init_word_collection(input: &Vec<String>) -> Vec<Word> {
     let mut v: Vec<Word> = Vec::new();
     for i in input {
         v.push(Word::new(i.to_owned()));
     }
-    return v
+    v
 }

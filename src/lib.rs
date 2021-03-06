@@ -7,7 +7,7 @@ type Sets = sets::Sets;
 /**
  * Transform letters to kana and print to stdout
  */
-pub fn transform_to_stdout(katakana_mode: bool, input_vec: Vec<String>) {
+pub fn transform_to_stdout(katakana_mode: bool, input_vec: &Vec<String>) {
     let words = internal_transform(katakana_mode, input_vec);
     for word in words {
         println!("{}",word.kana);
@@ -17,7 +17,7 @@ pub fn transform_to_stdout(katakana_mode: bool, input_vec: Vec<String>) {
 /**
  * Transform letters to kana and return result
  */
-pub fn transform(katakana_mode: bool, input_vec: Vec<String>) -> Vec<String> {
+pub fn transform(katakana_mode: bool, input_vec: &Vec<String>) -> Vec<String> {
     let words = internal_transform(katakana_mode, input_vec);
     let mut return_vec = Vec::new();
     for word in words {
@@ -26,7 +26,7 @@ pub fn transform(katakana_mode: bool, input_vec: Vec<String>) -> Vec<String> {
     return_vec
 }
 
-fn internal_transform(katakana_mode: bool, input_vec: Vec<String>) -> Vec<word::Word> {
+fn internal_transform(katakana_mode: bool, input_vec: &Vec<String>) -> Vec<word::Word> {
     let set: Sets; 
     if katakana_mode {
         set = Sets::new(sets::KanaType::Katakana);
