@@ -1,14 +1,12 @@
 use std::collections::HashMap;
 
-type OptStrTuple = std::option::Option<(String, String)>;
-
-pub fn interpret_tokens(input: &String) -> Vec<String> {
+pub fn interpret_tokens(input: &str) -> Vec<String> {
     let allowed_map = get_allowed_map();    
     let allowed_head = vec!["K","G","S","Z","T","D","J","N","H","B","P","F","M","Y","R","W"];
     let allowed_base = vec!["A","I","U","E","O"];
     let mut tokens: Vec<String> = Vec::new();
 
-    let mut remain = input.to_owned();
+    let mut remain = input.to_ascii_uppercase();
     let mut opt_token = search_for_token(&remain, &allowed_map, &allowed_head, &allowed_base);
     while opt_token.is_some() {
         let token = opt_token.expect("Token was None, despite this being impossible!");
@@ -21,22 +19,22 @@ pub fn interpret_tokens(input: &String) -> Vec<String> {
 }
 
 fn search_for_token(
-        remain: &String, 
+        remain: &str, 
         allowed_map: &HashMap<&str, Vec<&str>>, 
         allowed_head: &Vec<&str>, 
-        allowed_base: &Vec<&str>) -> OptStrTuple {
+        allowed_base: &Vec<&str>) -> Option<(String, String)> {
 
-    let one = length_one(&remain, &allowed_head, &allowed_base);
+    let one = length_one(remain, &allowed_head, &allowed_base);
     if let Some(one) = one {
         return Some(one)
     }
 
-    let two = length_two(&remain, &allowed_head, &allowed_base);
+    let two = length_two(remain, &allowed_head, &allowed_base);
     if let Some(two) = two {
         return Some(two)
     }
 
-    let three = length_three(&remain, &allowed_map);
+    let three = length_three(remain, &allowed_map);
     if let Some(three) = three {
         return Some(three)
     }
@@ -72,7 +70,7 @@ fn token_to_tuple(token: &str, split_index: usize) -> (&str,&str) {
 /**
  * Create the return value for the token searching functions
  */
-fn as_opt_str_tuple(token: &str, remain: &str) -> OptStrTuple {
+fn as_opt_str_tuple(token: &str, remain: &str) -> Option<(String, String)> {
     Some((String::from(token), String::from(remain)))
 }
 
@@ -80,7 +78,7 @@ fn as_opt_str_tuple(token: &str, remain: &str) -> OptStrTuple {
  * Search for Tokens of length one.
  * Return a found token and a splice of remaining input string.
  */
-fn length_one(input: &str, allowed_post_n: &Vec<&str>, allowed_base: &Vec<&str>) -> OptStrTuple {
+fn length_one(input: &str, allowed_post_n: &Vec<&str>, allowed_base: &Vec<&str>) -> Option<(String, String)> {
     if input.len() < 1 {
         return None
     }
@@ -103,11 +101,7 @@ fn length_one(input: &str, allowed_post_n: &Vec<&str>, allowed_base: &Vec<&str>)
     None
 }
 
-/**
- * Search for Tokens of length two.
- * Return a found token and a splice of remaining input string.
- */
-fn length_two(input: &str, allowed_head: &Vec<&str>, allowed_tail: &Vec<&str>) -> OptStrTuple {
+fn length_two(input: &str, allowed_head: &Vec<&str>, allowed_tail: &Vec<&str>) -> Option<(String, String)> {
     if input.len() < 2 {
         return None
     }
@@ -125,11 +119,7 @@ fn length_two(input: &str, allowed_head: &Vec<&str>, allowed_tail: &Vec<&str>) -
     None
 }
 
-/**
- * Search for Tokens of length three.
- * Return a found token and a splice of remaining input string.
- */
-fn length_three(input: &str, allowed_map: &HashMap<&str, Vec<&str>>) -> OptStrTuple {
+fn length_three(input: &str, allowed_map: &HashMap<&str, Vec<&str>>) -> Option<(String, String)> {
     if input.len() < 3 {
         return None
     }
@@ -143,12 +133,4 @@ fn length_three(input: &str, allowed_map: &HashMap<&str, Vec<&str>>) -> OptStrTu
     }
 
     None
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn placeholder() {
-        assert_eq!(1, 1);
-    }
 }

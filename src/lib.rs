@@ -1,45 +1,43 @@
-mod sets;
+mod set;
 mod tokens;
-mod word;
 
-type Sets = sets::Sets;
+use set::KanaType::{Hiragana, Katakana};
+use set::{CharacterSet};
 
-/**
- * Transform letters to kana and print to stdout
- */
-pub fn transform_to_stdout(katakana_mode: bool, input_vec: &Vec<String>) {
-    let words = internal_transform(katakana_mode, input_vec);
-    for word in words {
-        println!("{}",word.kana);
-    }
+pub fn to_katakana(input: &str) -> String {
+    let set = CharacterSet::new(Katakana);
+    internal_transform(&set, input)
 }
 
-/**
- * Transform letters to kana and return result
- */
-pub fn transform(katakana_mode: bool, input_vec: &Vec<String>) -> Vec<String> {
-    let words = internal_transform(katakana_mode, input_vec);
-    let mut return_vec = Vec::new();
-    for word in words {
-        return_vec.push(word.kana);
-    }
-    return_vec
+pub fn to_hiragana(input: &str) -> String {
+    let set = CharacterSet::new(Hiragana);
+    internal_transform(&set, input)
 }
 
-fn internal_transform(katakana_mode: bool, input_vec: &Vec<String>) -> Vec<word::Word> {
-    let set: Sets; 
-    if katakana_mode {
-        set = Sets::new(sets::KanaType::Katakana);
-    } else {
-        set = Sets::new(sets::KanaType::Hiragana);
+fn internal_transform(set: &CharacterSet, input: &str) -> String {
+    let tokens = tokens::interpret_tokens(input);
+    let mut word = String::new();
+    for token in tokens {
+        word.push_str(set.get(&token));
     }
 
-    let mut words = word::init_word_collection(input_vec);
+    word
+}
 
-    for word in &mut words {
-        word.set_tokens(tokens::interpret_tokens(&word.original));
-        word.set_kana(&set.kana_dict);
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_hiragana() {
+        assert_eq!(to_hiragana("a"), "あ");
+        assert_eq!(to_hiragana("konnichiha"), "こんにちは");
+        assert_eq!(to_hiragana("toukyou"), "とうきょう");
+        assert_eq!(to_hiragana("nihongonogasuki"), "にほんごのがすき")
     }
 
-    words
+    #[test]
+    fn test_katakana() {
+        assert_eq!(to_katakana("kokonatsu"), "ココナツ");
+    }
 }

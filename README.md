@@ -1,2 +1,12 @@
 # kana
-Turn letters into kana
+
+Transform Romaji sentences into either Katakana or Hiragana.
+
+```rust
+use kana;
+
+let example = "konnichiha";
+let hiragana = kana::to_hiragana(example);
+
+assert_eq!(hiragana, "こんにちは");
+```
