@@ -1,28 +1,41 @@
 use std::collections::HashMap;
 
-pub fn interpret_tokens(input: &str) -> Vec<String> {
+use super::error::Error;
+
+pub fn parse(input: &str) -> Result<Vec<&str>, Error> {
+    if input.is_empty() {
+        return Ok(Vec::new())
+    }
+    
     let allowed_map = get_allowed_map();    
     let allowed_head = vec!["K","G","S","Z","T","D","J","N","H","B","P","F","M","Y","R","W"];
     let allowed_base = vec!["A","I","U","E","O"];
-    let mut tokens: Vec<String> = Vec::new();
+    let mut tokens: Vec<&str> = Vec::new();
 
-    let mut remain = input.to_ascii_uppercase();
+    let mut remain = input;
     let mut opt_token = search_for_token(&remain, &allowed_map, &allowed_head, &allowed_base);
+    
+    if opt_token.is_none() {
+        return Err(Error::new("invalid sequence"))
+    }
+
     while opt_token.is_some() {
+        
+        // TODO Check if tokens can be parsed
         let token = opt_token.expect("Token was None, despite this being impossible!");
         tokens.push(token.0);
         remain = token.1;
         opt_token = search_for_token(&remain, &allowed_map, &allowed_head, &allowed_base);
     }
 
-    tokens
+    Ok(tokens)
 }
 
-fn search_for_token(
-        remain: &str, 
+fn search_for_token<'a>(
+        remain: &'a str, 
         allowed_map: &HashMap<&str, Vec<&str>>, 
         allowed_head: &Vec<&str>, 
-        allowed_base: &Vec<&str>) -> Option<(String, String)> {
+        allowed_base: &Vec<&str>) -> Option<(&'a str, &'a str)> {
 
     let one = length_one(remain, &allowed_head, &allowed_base);
     if let Some(one) = one {
@@ -70,15 +83,15 @@ fn token_to_tuple(token: &str, split_index: usize) -> (&str,&str) {
 /**
  * Create the return value for the token searching functions
  */
-fn as_opt_str_tuple(token: &str, remain: &str) -> Option<(String, String)> {
-    Some((String::from(token), String::from(remain)))
+fn as_opt_str_tuple<'a>(token: &'a str, remain: &'a str) -> Option<(&'a str, &'a str)> {
+    Some((token, remain))
 }
 
 /**
  * Search for Tokens of length one.
  * Return a found token and a splice of remaining input string.
  */
-fn length_one(input: &str, allowed_post_n: &Vec<&str>, allowed_base: &Vec<&str>) -> Option<(String, String)> {
+fn length_one<'a>(input: &'a str, allowed_post_n: &Vec<&str>, allowed_base: &Vec<&str>) -> Option<(&'a str, &'a str)> {
     if input.len() < 1 {
         return None
     }
@@ -101,7 +114,7 @@ fn length_one(input: &str, allowed_post_n: &Vec<&str>, allowed_base: &Vec<&str>)
     None
 }
 
-fn length_two(input: &str, allowed_head: &Vec<&str>, allowed_tail: &Vec<&str>) -> Option<(String, String)> {
+fn length_two<'a>(input: &'a str, allowed_head: &Vec<&str>, allowed_tail: &Vec<&str>) -> Option<(&'a str, &'a str)> {
     if input.len() < 2 {
         return None
     }
@@ -119,7 +132,7 @@ fn length_two(input: &str, allowed_head: &Vec<&str>, allowed_tail: &Vec<&str>) -
     None
 }
 
-fn length_three(input: &str, allowed_map: &HashMap<&str, Vec<&str>>) -> Option<(String, String)> {
+fn length_three<'a>(input: &'a str, allowed_map: &HashMap<&str, Vec<&str>>) -> Option<(&'a str, &'a str)> {
     if input.len() < 3 {
         return None
     }

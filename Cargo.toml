@@ -3,5 +3,11 @@ name = "kana"
 version = "0.1.0"
 authors = ["vkstrm"]
 edition = "2018"
+description = "Turn Romaji strings into Hiragana or Katakana"
+keywords = ["Japanese","Language"]
+repository = "https://github.com/vkstrm/kana"
+readme = "README.md"
+license = "MIT"
+publish = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
