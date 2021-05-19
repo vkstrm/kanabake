@@ -132,6 +132,7 @@ mod test {
 
     #[test]
     fn test_valid_katakana() -> Result<(),Error> {
+        assert_eq!(to_katakana("a")?, "ア");
         assert_eq!(to_katakana("kokonattsu")?, "ココナッツ");
         Ok(())
     }
