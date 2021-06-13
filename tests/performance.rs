@@ -1,6 +1,6 @@
 use kana;
 
-#[test]
+#[test] // Run with cargo test --release -- --nocapture
 fn performance() -> Result<(), Box<dyn std::error::Error>> {
     let hiragana_time = std::time::Instant::now();
     for _ in 0..1000 {

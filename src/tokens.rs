@@ -2,56 +2,126 @@ use std::collections::HashMap;
 
 use super::error::Error;
 
-pub fn parse(input: &str) -> Result<Vec<&str>, Error> {
-    if input.is_empty() {
-        return Ok(Vec::new())
-    }
-    
-    let allowed_map = get_allowed_map();    
-    let allowed_head = vec!["K","G","S","Z","T","D","J","N","H","B","P","F","M","Y","R","W"];
-    let allowed_base = vec!["A","I","U","E","O"];
-    let mut tokens: Vec<&str> = Vec::new();
-
-    let mut remain = input;
-    let mut opt_token = search_for_token(&remain, &allowed_map, &allowed_head, &allowed_base);
-    
-    if opt_token.is_none() {
-        return Err(Error::new("invalid sequence"))
-    }
-
-    while opt_token.is_some() {
-        
-        // TODO Check if tokens can be parsed
-        let token = opt_token.expect("Token was None, despite this being impossible!");
-        tokens.push(token.0);
-        remain = token.1;
-        opt_token = search_for_token(&remain, &allowed_map, &allowed_head, &allowed_base);
-    }
-
-    Ok(tokens)
+pub struct Parser {
+    allowed_map: HashMap<&'static str, std::vec::Vec<&'static str>>,
+    allowed_head: Vec<&'static str>,
+    allowed_base: Vec<&'static str>,
 }
 
-fn search_for_token<'a>(
-        remain: &'a str, 
-        allowed_map: &HashMap<&str, Vec<&str>>, 
-        allowed_head: &Vec<&str>, 
-        allowed_base: &Vec<&str>) -> Option<(&'a str, &'a str)> {
-
-    let one = length_one(remain, &allowed_head, &allowed_base);
-    if let Some(one) = one {
-        return Some(one)
+impl Parser {
+    pub fn new() -> Parser {
+        return Parser {
+            allowed_map: get_allowed_map(),
+            allowed_head: vec!["K","G","S","Z","T","D","J","N","H","B","P","F","M","Y","R","W"],
+            allowed_base: vec!["A","I","U","E","O"]
+        }
     }
 
-    let two = length_two(remain, &allowed_head, &allowed_base);
-    if let Some(two) = two {
-        return Some(two)
+    pub fn parse<'a>(&self, input: &'a str) -> Result<Vec<&'a str>, Error> {
+        if input.is_empty() {
+            return Ok(Vec::new())
+        }
+        
+        let mut opt_token = self.search_for_token(&input);
+        if opt_token.is_none() {
+            return Err(Error::new("invalid sequence"))
+        }
+    
+        let mut tokens: Vec<&str> = Vec::new();
+        let token = opt_token.unwrap();
+        tokens.push(token.0);
+        let mut remain = token.1;
+        while remain.len() > 0 {
+            opt_token = self.search_for_token(&remain);
+            if opt_token.is_none() {
+                return Err(Error::from_remain(remain))
+            }
+    
+            let token = opt_token.unwrap();
+            tokens.push(token.0);
+            remain = token.1;
+        }
+    
+        Ok(tokens)
     }
 
-    let three = length_three(remain, &allowed_map);
-    if let Some(three) = three {
-        return Some(three)
+    fn search_for_token<'a>(&self, remain: &'a str) -> Option<(&'a str, &'a str)> {
+        let one = self.length_one(remain);
+        if let Some(one) = one {
+            return Some(one)
+        }
+
+        let two = self.length_two(remain);
+        if let Some(two) = two {
+            return Some(two)
+        }
+
+        let three = self.length_three(remain);
+        if let Some(three) = three {
+            return Some(three)
+        }
+        None
     }
-    None
+
+    /**
+     * Search for Tokens of length one.
+     * Return a found token and a splice of remaining input string.
+     */
+    fn length_one<'a>(&self, input: &'a str) -> Option<(&'a str, &'a str)> {
+        if input.len() < 1 {
+            return None
+        }
+
+        let token = &input[..1];
+        let remain = &input[1..];
+        if self.allowed_base.contains(&token) {
+            return as_opt_str_tuple(token, remain);
+        }
+        if token == "N" {
+            if remain.len() < 1 {
+                return as_opt_str_tuple(token, remain);
+            }
+            let r = &remain[..1];
+            if self.allowed_head.contains(&r) {
+                return as_opt_str_tuple(token,remain);
+            }
+        }
+        None
+    }
+
+    fn length_two<'a>(&self, input: &'a str) -> Option<(&'a str, &'a str)> {
+        if input.len() < 2 {
+            return None
+        }
+
+        let token = token_to_tuple(&input[..2], 1);
+        let remain = &input[2..];
+
+        if &token.0 == &token.1 && self.allowed_head.contains(&token.0)  {
+            return as_opt_str_tuple("LTSU", &input[1..])
+        }
+
+        if self.allowed_head.contains(&token.0) && self.allowed_base.contains(&token.1) {
+            return as_opt_str_tuple(&input[..2], remain)
+        }
+        None
+    }
+
+    fn length_three<'a>(&self, input: &'a str) -> Option<(&'a str, &'a str)> {
+        if input.len() < 3 {
+            return None
+        }
+
+        let token = token_to_tuple(&input[..3], 2);
+        let remain = &input[3..];
+
+        if self.allowed_map.contains_key(token.0) 
+            && self.allowed_map.get(token.0).expect("Oops").contains(&token.1) {
+                return as_opt_str_tuple(&input[..3], remain);
+        }
+
+        None
+    }
 }
 
 fn get_allowed_map() -> HashMap<&'static str, Vec<&'static str>> {
@@ -85,65 +155,4 @@ fn token_to_tuple(token: &str, split_index: usize) -> (&str,&str) {
  */
 fn as_opt_str_tuple<'a>(token: &'a str, remain: &'a str) -> Option<(&'a str, &'a str)> {
     Some((token, remain))
-}
-
-/**
- * Search for Tokens of length one.
- * Return a found token and a splice of remaining input string.
- */
-fn length_one<'a>(input: &'a str, allowed_post_n: &Vec<&str>, allowed_base: &Vec<&str>) -> Option<(&'a str, &'a str)> {
-    if input.len() < 1 {
-        return None
-    }
-
-    let token = &input[..1];
-    let remain = &input[1..];
-
-    if allowed_base.contains(&token) {
-        return as_opt_str_tuple(token,remain);
-    }
-    if token == "N" {
-        if remain.len() < 1 {
-            return as_opt_str_tuple(token, remain);
-        }
-        let r = &remain[..1];
-        if allowed_post_n.contains(&r) {
-            return as_opt_str_tuple(token,remain);
-        }
-    }
-    None
-}
-
-fn length_two<'a>(input: &'a str, allowed_head: &Vec<&str>, allowed_tail: &Vec<&str>) -> Option<(&'a str, &'a str)> {
-    if input.len() < 2 {
-        return None
-    }
-
-    let token = token_to_tuple(&input[..2], 1);
-    let remain = &input[2..];
-
-    if &token.0 == &token.1 && allowed_head.contains(&token.0)  {
-        return as_opt_str_tuple("LTSU", &input[1..])
-    }
-
-    if allowed_head.contains(&token.0) && allowed_tail.contains(&token.1) {
-        return as_opt_str_tuple(&input[..2], remain)
-    }
-    None
-}
-
-fn length_three<'a>(input: &'a str, allowed_map: &HashMap<&str, Vec<&str>>) -> Option<(&'a str, &'a str)> {
-    if input.len() < 3 {
-        return None
-    }
-
-    let token = token_to_tuple(&input[..3], 2);
-    let remain = &input[3..];
-
-    if allowed_map.contains_key(token.0) 
-        && allowed_map.get(token.0).expect("Oops").contains(&token.1) {
-            return as_opt_str_tuple(&input[..3], remain);
-    }
-
-    None
 }
