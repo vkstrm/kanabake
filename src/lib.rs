@@ -5,7 +5,7 @@
 //! either Katakana or Hiragana as output.
 //! 
 mod set;
-mod tokens;
+mod parser;
 mod error;
 
 use set::KanaType::{Hiragana, Katakana};
@@ -106,50 +106,9 @@ fn internal_transform(set: &CharacterSet, uppercase_input: String) -> Result<Str
 }
 
 fn tokenize(input: &str) -> Result<Vec<&str>, Error> {
-    let parser = tokens::Parser::new();
-
+    let parser = parser::Parser::new();
     match parser.parse(input) {
         Ok(tokens) => Ok(tokens),
         Err(why) => Err(why)
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_valid_hiragana() -> Result<(),Error> {
-        assert_eq!(to_hiragana("")?, "");
-        assert_eq!(to_hiragana("a")?, "あ");
-        assert_eq!(to_hiragana("aaaa")?, "ああああ");
-        assert_eq!(to_hiragana("aiueo")?, "あいうえお");
-        assert_eq!(to_hiragana("nna")?, "んな");
-        assert_eq!(to_hiragana("nnn")?, "んんん");
-        assert_eq!(to_hiragana("onna")?, "おんな");
-        assert_eq!(to_hiragana("du")?, "づ");
-        assert_eq!(to_hiragana("mitte")?, "みって");
-        assert_eq!(to_hiragana("nihongonogasuki")?, "にほんごのがすき");
-        Ok(())
-    }
-
-    #[test]
-    fn test_valid_katakana() -> Result<(),Error> {
-        assert_eq!(to_katakana("a")?, "ア");
-        assert_eq!(to_katakana("kokonattsu")?, "ココナッツ");
-        Ok(())
-    }
-
-    #[test]
-    fn test_is_valid() {
-        assert_eq!(is_valid(""), true);
-        assert_eq!(is_valid("konnichiha"), true);
-    }
-
-    #[test]
-    fn test_is_invalid() {
-        assert_eq!(is_valid("x"), false);
-        assert_eq!(is_valid("konnichihä"), false);
-        assert_eq!(is_valid("kicheese"), false);
     }
 }

@@ -1,9 +1,9 @@
 use std::collections::HashMap;
+use lazy_static::lazy_static;
 
 use super::error::Error;
 
 pub struct Parser {
-    allowed_map: HashMap<&'static str, std::vec::Vec<&'static str>>,
     allowed_head: Vec<&'static str>,
     allowed_base: Vec<&'static str>,
 }
@@ -11,7 +11,6 @@ pub struct Parser {
 impl Parser {
     pub fn new() -> Parser {
         return Parser {
-            allowed_map: get_allowed_map(),
             allowed_head: vec!["K","G","S","Z","T","D","J","N","H","B","P","F","M","Y","R","W"],
             allowed_base: vec!["A","I","U","E","O"]
         }
@@ -75,15 +74,15 @@ impl Parser {
         let token = &input[..1];
         let remain = &input[1..];
         if self.allowed_base.contains(&token) {
-            return as_opt_str_tuple(token, remain);
+            return Some((token, remain));
         }
         if token == "N" {
             if remain.len() < 1 {
-                return as_opt_str_tuple(token, remain);
+                return Some((token, remain));
             }
             let r = &remain[..1];
             if self.allowed_head.contains(&r) {
-                return as_opt_str_tuple(token,remain);
+                return Some((token,remain));
             }
         }
         None
@@ -98,11 +97,11 @@ impl Parser {
         let remain = &input[2..];
 
         if &token.0 == &token.1 && self.allowed_head.contains(&token.0)  {
-            return as_opt_str_tuple("LTSU", &input[1..])
+            return Some(("LTSU", &input[1..]))
         }
 
         if self.allowed_head.contains(&token.0) && self.allowed_base.contains(&token.1) {
-            return as_opt_str_tuple(&input[..2], remain)
+            return Some((&input[..2], remain))
         }
         None
     }
@@ -115,32 +114,35 @@ impl Parser {
         let token = token_to_tuple(&input[..3], 2);
         let remain = &input[3..];
 
-        if self.allowed_map.contains_key(token.0) 
-            && self.allowed_map.get(token.0).expect("Oops").contains(&token.1) {
-                return as_opt_str_tuple(&input[..3], remain);
+        if ALLOWED_MAP.contains_key(token.0) 
+            && ALLOWED_MAP.get(token.0).expect("Oops").contains(&token.1) {
+                return Some((&input[..3], remain));
         }
 
         None
     }
 }
 
-fn get_allowed_map() -> HashMap<&'static str, Vec<&'static str>> {
-    let mut map: HashMap<&str, Vec<&str>> = HashMap::new();
-    map.insert("KY", vec!["A","U","O"]);
-    map.insert("GY", vec!["A","U","O"]);
-    map.insert("SH", vec!["A","I","U","O"]);
-    map.insert("CH", vec!["A","I","U","O"]);
-    map.insert("TS", vec!["U"]);
-    map.insert("DZ", vec!["U"]);
-    map.insert("NY", vec!["A","U","O"]);
-    map.insert("DY", vec!["A","U","O"]);
-    map.insert("JY", vec!["A","U","O"]);
-    map.insert("RY", vec!["A","U","O"]);
-    map.insert("HY", vec!["A","U","O"]);
-    map.insert("BY", vec!["A","U","O"]);
-    map.insert("PY", vec!["A","U","O"]);
-    map.insert("MY", vec!["A","U","O"]);
-    map
+
+lazy_static! {
+    static ref ALLOWED_MAP: HashMap<&'static str, Vec<&'static str>> = {
+        let mut map = HashMap::new();
+        map.insert("KY", vec!["A","U","O"]);
+        map.insert("GY", vec!["A","U","O"]);
+        map.insert("SH", vec!["A","I","U","O"]);
+        map.insert("CH", vec!["A","I","U","O"]);
+        map.insert("TS", vec!["U"]);
+        map.insert("DZ", vec!["U"]);
+        map.insert("NY", vec!["A","U","O"]);
+        map.insert("DY", vec!["A","U","O"]);
+        map.insert("JY", vec!["A","U","O"]);
+        map.insert("RY", vec!["A","U","O"]);
+        map.insert("HY", vec!["A","U","O"]);
+        map.insert("BY", vec!["A","U","O"]);
+        map.insert("PY", vec!["A","U","O"]);
+        map.insert("MY", vec!["A","U","O"]);
+        map
+    };
 }
 
 /**
@@ -148,11 +150,4 @@ fn get_allowed_map() -> HashMap<&'static str, Vec<&'static str>> {
  */
 fn token_to_tuple(token: &str, split_index: usize) -> (&str,&str) {
     token.split_at(split_index)
-}
-
-/**
- * Create the return value for the token searching functions
- */
-fn as_opt_str_tuple<'a>(token: &'a str, remain: &'a str) -> Option<(&'a str, &'a str)> {
-    Some((token, remain))
 }

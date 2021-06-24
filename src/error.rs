@@ -1,5 +1,5 @@
 #[derive(Debug)]
-pub struct Error { // TODO unit struct?
+pub struct Error {
     message: String
 }
 
@@ -32,11 +32,11 @@ impl std::fmt::Display for Error {
 }
 
 fn format_error_message(remain: &str) -> String {
-    let message: String;
+    let invalid: &str;
     if remain.len() >= 3 {
-        message = format!("invalid sequence: \"{}...\"", &remain[..3]);
+        invalid = &remain[..3];
     } else {
-        message = format!("invalid sequence: \"{}\"", &remain[..remain.len()])
+        invalid = &remain[..remain.len()];
     }
-    return message.to_lowercase();
+    return format!("invalid sequence: \"{}\"", invalid).to_lowercase();
 }
