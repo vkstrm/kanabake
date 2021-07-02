@@ -17,10 +17,15 @@ impl CharacterSet {
         }
     }
 
-    pub fn get(&self, key: &str) -> &str {
-        match &self.kind {
-            KanaType::Hiragana => HIRAGANA.get(&key).expect("No such token in map"),
-            KanaType::Katakana => KATAKANA.get(&key).expect("No such token in map"),
+    pub fn get(&self, key: &str) -> Option<&str> {
+        let option = match &self.kind {
+            KanaType::Hiragana => HIRAGANA.get(key),
+            KanaType::Katakana => KATAKANA.get(key),
+        };
+
+        match option {
+            Some(val) => Some(val),
+            None => None,
         }
     }
 }
@@ -99,6 +104,7 @@ lazy_static! {
         map.insert("HYU", "ひゅ");
         map.insert("HYO", "ひょ");
         map.insert("FU", "ふ");
+        map.insert("HU", "ふ");
         map.insert("HE", "へ");
         map.insert("HO", "ほ");
         map.insert("BA", "ば");
@@ -218,6 +224,7 @@ lazy_static! {
         map.insert("HYU", "ヒュ");
         map.insert("HYO", "ヒョ");
         map.insert("FU", "フ");
+        map.insert("HU", "フ");
         map.insert("HE", "ヘ");
         map.insert("HO", "ホ");
         map.insert("BA", "バ");

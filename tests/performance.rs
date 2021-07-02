@@ -1,7 +1,7 @@
 use kana;
 
 #[test] // Run with cargo test --release -- --nocapture
-fn performance() -> Result<(), Box<dyn std::error::Error>> {
+fn performance() -> Result<(), kana::error::Error> {
     let hiragana_time = std::time::Instant::now();
     for _ in 0..1000 {
         kana::to_hiragana("aiueokakikukekosashisusesotachitsuteto")?;

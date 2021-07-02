@@ -59,6 +59,12 @@ impl Parser {
         if let Some(three) = three {
             return Some(three)
         }
+
+        let four = self.length_four(remain);
+        if let Some(four) = four {
+            return Some(four)
+        }
+        
         None
     }
 
@@ -96,6 +102,7 @@ impl Parser {
         let token = token_to_tuple(&input[..2], 1);
         let remain = &input[2..];
 
+        // "atta" -> あった
         if &token.0 == &token.1 && self.allowed_head.contains(&token.0)  {
             return Some(("LTSU", &input[1..]))
         }
@@ -115,8 +122,23 @@ impl Parser {
         let remain = &input[3..];
 
         if ALLOWED_MAP.contains_key(token.0) 
-            && ALLOWED_MAP.get(token.0).expect("Oops").contains(&token.1) {
+        && ALLOWED_MAP.get(token.0).expect("no token in map").contains(&token.1) {
                 return Some((&input[..3], remain));
+        }
+
+        None
+    }
+
+    fn length_four<'a>(&self, input: &'a str) -> Option<(&'a str, &'a str)> {
+        if input.len() < 4 {
+            return None
+        }
+
+        let token = &input[..4];
+        let remain = &input[4..];
+
+        if token == "LTSU" {
+            return Some(("LTSU", remain))
         }
 
         None

@@ -6,16 +6,15 @@
 //! 
 mod set;
 mod parser;
-mod error;
+pub mod error;
 
 use set::KanaType::{Hiragana, Katakana};
 use set::{CharacterSet};
 use error::Error;
 
-/// String input to Katakana representation
+/// Transform wapuro romaji string to katakana string.
 /// 
-/// From an ASCII Romaji input, get the UTF-8 Katakana 
-/// representation of the same input.  
+/// Valid input is ASCII only.
 /// 
 /// # Examples
 /// 
@@ -41,7 +40,9 @@ pub fn to_katakana(input: &str) -> Result<String, Error> {
     }
 }
 
-/// Get Hiragana representation of string input
+/// Transform wapuro romaji string to hiragana string.
+/// 
+/// Valid input is ASCII only.
 /// 
 /// # Example
 /// 
@@ -83,6 +84,14 @@ pub fn is_valid(input: &str) -> bool {
     false
 }
 
+// fn is_hiragana(input: &str) -> bool {
+
+// }
+
+// fn is_katakana(input: &str) -> bool {
+
+// }
+
 fn validate_input(input: &str) -> Result<String, Error> {
     if input.is_empty() {
         return Ok(String::new())
@@ -99,7 +108,10 @@ fn internal_transform(set: &CharacterSet, uppercase_input: String) -> Result<Str
     let tokens = tokenize(&uppercase_input)?;
     let mut word = String::new();
     for token in tokens {
-        word.push_str(set.get(&token));
+        match set.get(&token) {
+            Some(kana) => word.push_str(kana),
+            None => return Err(Error::new(&format!("token {} is not in map", token))),
+        }
     }
 
     Ok(word)
