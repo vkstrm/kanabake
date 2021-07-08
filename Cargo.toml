@@ -1,11 +1,11 @@
 [package]
-name = "kana"
+name = "kanabake"
 version = "0.1.0"
 authors = ["vkstrm"]
 edition = "2018"
 description = "Turn Romaji strings into Hiragana or Katakana"
-keywords = ["Japanese","Language"]
-repository = "https://github.com/vkstrm/kana"
+keywords = ["japanese", "kana"]
+repository = "https://github.com/vkstrm/kanabake"
 readme = "README.md"
 license = "MIT"
 publish = false

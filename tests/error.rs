@@ -1,8 +1,8 @@
-use kana;
+use kanabake;
 
 #[test]
 fn test_error_message_len_plus3() {
-    let result = kana::to_hiragana("kicheese");
+    let result = kanabake::to_hiragana("kicheese");
     assert_eq!(result.is_err(), true);
     let error = result.unwrap_err();
     assert_eq!(error.message(), "invalid sequence: \"che\"")
@@ -10,7 +10,7 @@ fn test_error_message_len_plus3() {
 
 #[test]
 fn test_error_message_len_3() {
-    let result = kana::to_hiragana("kiche");
+    let result = kanabake::to_hiragana("kiche");
     assert_eq!(result.is_err(), true);
     let error = result.unwrap_err();
     assert_eq!(error.message(), "invalid sequence: \"che\"")
@@ -18,7 +18,7 @@ fn test_error_message_len_3() {
 
 #[test]
 fn test_error_message_len_2() {
-    let result = kana::to_hiragana("kich");
+    let result = kanabake::to_hiragana("kich");
     assert_eq!(result.is_err(), true);
     let error = result.unwrap_err();
     assert_eq!(error.message(), "invalid sequence: \"ch\"")
@@ -26,7 +26,7 @@ fn test_error_message_len_2() {
 
 #[test]
 fn test_error_message_len_1() {
-    let result = kana::to_hiragana("kix");
+    let result = kanabake::to_hiragana("kix");
     assert_eq!(result.is_err(), true);
     let error = result.unwrap_err();
     assert_eq!(error.message(), "invalid sequence: \"x\"")

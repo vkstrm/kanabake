@@ -21,7 +21,7 @@ use error::Error;
 /// ```rust
 /// # fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 /// let romaji = "kokonattsu";
-/// let katakana = kana::to_katakana(romaji)?;
+/// let katakana = kanabake::to_katakana(romaji)?;
 /// 
 /// assert_eq!(katakana, "ココナッツ");
 /// # Ok(())
@@ -49,7 +49,7 @@ pub fn to_katakana(input: &str) -> Result<String, Error> {
 /// ```rust
 /// # fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 /// let romaji = "konnichiha";
-/// let hiragana = kana::to_hiragana(romaji)?;
+/// let hiragana = kanabake::to_hiragana(romaji)?;
 /// 
 /// assert_eq!(hiragana, "こんにちは");
 /// # Ok(())
@@ -70,8 +70,8 @@ pub fn to_hiragana(input: &str) -> Result<String, Error> {
 /// # Example
 /// ```rust
 /// # fn main() {
-/// assert_eq!(kana::is_valid("konnichiha"), true);
-/// assert_eq!(kana::is_valid("könnichiha"), false);
+/// assert_eq!(kanabake::is_valid("konnichiha"), true);
+/// assert_eq!(kanabake::is_valid("könnichiha"), false);
 /// # }
 pub fn is_valid(input: &str) -> bool {
     if let Ok(uppercase_input) = validate_input(input) {
