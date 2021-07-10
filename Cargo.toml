@@ -9,6 +9,7 @@ repository = "https://github.com/vkstrm/kanabake"
 readme = "README.md"
 license = "MIT"
 publish = ["crates-io"]
+exclude = ["/tests/*"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
