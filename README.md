@@ -14,7 +14,7 @@ Currently the following functionality is available.
 ```rust
 to_hiragana(&str) -> Result<String, Error>  // Ascii to hiragana
 to_katakana(&str) -> Result<String, Error>  // Ascii to katakana
-is_valid(&str) -> Result<String, Error>     // Can input be transformed?
+is_valid(&str) -> bool     // Can input be transformed?
 ```
 
 ## Examples
