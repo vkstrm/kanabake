@@ -53,3 +53,12 @@ fn test_hiragana_ltsu() -> Result<(), kanabake::error::Error> {
     assert_eq!(kanabake::to_hiragana("altsuo")?, "あっお");
     Ok(())
 }
+
+#[test]
+fn test_is_hiragana() {
+    assert_eq!(kanabake::is_hiragana("あいうえお"), true);
+    assert_eq!(kanabake::is_hiragana("んんんん"), true);
+    assert_eq!(kanabake::is_hiragana("ぎょうきょうわを"), true);
+    assert_eq!(kanabake::is_hiragana("AIEUO"), false);
+    assert_eq!(kanabake::is_hiragana("アイウエオ"), false);
+}

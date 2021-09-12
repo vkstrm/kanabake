@@ -84,13 +84,43 @@ pub fn is_valid(input: &str) -> bool {
     false
 }
 
-// fn is_hiragana(input: &str) -> bool {
+/// Check if all characters in string input are hiragana.
+///
+/// # Example
+/// ```rust
+/// # fn main() {
+/// assert_eq!(kanabake::is_hiragana("あいうえお"), true);
+/// # }
+pub fn is_hiragana(input: &str) -> bool {
+    let hir_start: u32 = 'ぁ' as u32;
+    let hir_end: u32 = 'ゟ'  as u32;
+    for c in input.chars() {
+        let unicode_val = c as u32;
+        if unicode_val < hir_start || unicode_val > hir_end {
+            return false;
+        }
+    }
+    true
+}
 
-// }
-
-// fn is_katakana(input: &str) -> bool {
-
-// }
+/// Check if all characters in string input are katakana.
+///
+/// # Example
+/// ```rust
+/// # fn main() {
+/// assert_eq!(kanabake::is_katakana("アイウエオ"), true);
+/// # }
+pub fn is_katakana(input: &str) -> bool {
+    let kat_start: u32 = '゠' as u32;
+    let kat_end: u32 = 'ヿ'  as u32;
+    for c in input.chars() {
+        let unicode_val = c as u32;
+        if unicode_val < kat_start || unicode_val > kat_end {
+            return false;
+        }
+    }
+    true
+}
 
 fn validate_input(input: &str) -> Result<String, Error> {
     if input.is_empty() {

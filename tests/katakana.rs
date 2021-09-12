@@ -50,3 +50,12 @@ fn test_katakana_ltsu() -> Result<(), kanabake::error::Error> {
     assert_eq!(kanabake::to_katakana("altsuo")?, "アッオ");
     Ok(())
 }
+
+#[test]
+fn test_is_katakana() {
+    assert_eq!(kanabake::is_katakana("アイウエオ"), true);
+    assert_eq!(kanabake::is_katakana("ンンン"), true);
+    assert_eq!(kanabake::is_katakana("ギョウキョウ"), true);
+    assert_eq!(kanabake::is_katakana("AIEUO"), false);
+    assert_eq!(kanabake::is_katakana("あいうえお"), false);
+}
