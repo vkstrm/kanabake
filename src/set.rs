@@ -12,9 +12,7 @@ pub struct CharacterSet {
 
 impl CharacterSet {
     pub fn new(set_type: KanaType) -> CharacterSet {
-        CharacterSet {
-            kind: set_type,
-        }
+        CharacterSet { kind: set_type }
     }
 
     pub fn get(&self, key: &str) -> Option<&str> {

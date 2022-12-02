@@ -1,12 +1,12 @@
 //! Custom error typ
 
 /// Custom error type.
-/// 
+///
 /// Contents of message contains specific invalid input
 /// if it occurs during parsing of input.
 #[derive(Debug)]
 pub struct Error {
-    message: String
+    message: String,
 }
 
 impl std::error::Error for Error {}
@@ -22,7 +22,7 @@ impl Error {
 
     pub(crate) fn from_remain(remain: &str) -> Error {
         Error {
-            message: format_error_message(remain)
+            message: format_error_message(remain),
         }
     }
 
@@ -39,13 +39,12 @@ impl std::fmt::Display for Error {
 }
 
 fn format_error_message(remain: &str) -> String {
-    let invalid: &str;
-    if remain.len() >= 3 {
-        invalid = &remain[..3];
+    let invalid = if remain.len() >= 3 {
+        &remain[..3]
     } else {
-        invalid = &remain[..remain.len()];
-    }
-    return format!("invalid sequence: \"{}\"", invalid).to_lowercase();
+        &remain[..remain.len()]
+    };
+    format!("invalid sequence: \"{}\"", invalid).to_lowercase()
 }
 
 #[cfg(test)]
@@ -54,9 +53,9 @@ mod tests {
 
     #[test]
     fn message_format() {
-        assert_eq!(format_error_message("abcdefg"),"invalid sequence: \"abc\"");
-        assert_eq!(format_error_message("abc"),"invalid sequence: \"abc\"");
-        assert_eq!(format_error_message("ab"),"invalid sequence: \"ab\"");
-        assert_eq!(format_error_message("a"),"invalid sequence: \"a\"");
+        assert_eq!(format_error_message("abcdefg"), "invalid sequence: \"abc\"");
+        assert_eq!(format_error_message("abc"), "invalid sequence: \"abc\"");
+        assert_eq!(format_error_message("ab"), "invalid sequence: \"ab\"");
+        assert_eq!(format_error_message("a"), "invalid sequence: \"a\"");
     }
 }

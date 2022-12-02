@@ -28,7 +28,10 @@ fn test_valid_hiragana() -> Result<(), kanabake::error::Error> {
     assert_eq!(kanabake::to_hiragana("onna")?, "おんな");
     assert_eq!(kanabake::to_hiragana("du")?, "づ");
     assert_eq!(kanabake::to_hiragana("mitte")?, "みって");
-    assert_eq!(kanabake::to_hiragana("nihongonogasuki")?, "にほんごのがすき");
+    assert_eq!(
+        kanabake::to_hiragana("nihongonogasuki")?,
+        "にほんごのがすき"
+    );
     Ok(())
 }
 
