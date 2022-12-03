@@ -91,7 +91,7 @@ fn length_two(input: &str) -> Option<(&str, &str)> {
         return None;
     }
 
-    let token = token_to_tuple(&input[..2], 1);
+    let token = input[..2].split_at(1);
     let remain = &input[2..];
 
     // "atta" -> あった
@@ -110,7 +110,7 @@ fn length_three(input: &str) -> Option<(&str, &str)> {
         return None;
     }
 
-    let token = token_to_tuple(&input[..3], 2);
+    let token = input[..3].split_at(2);
     let remain = &input[3..];
 
     if ALLOWED_MAP.contains_key(token.0)
@@ -159,11 +159,4 @@ lazy_static! {
         map.insert("MY", vec!["A", "U", "O"]);
         map
     };
-}
-
-/**
- * Split token to str slices at index, return as tuple.
- */
-fn token_to_tuple(token: &str, split_index: usize) -> (&str, &str) {
-    token.split_at(split_index)
 }
