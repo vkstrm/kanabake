@@ -7,30 +7,30 @@ const ALLOWED_HEAD: [&str; 16] = [
     "K", "G", "S", "Z", "T", "D", "J", "N", "H", "B", "P", "F", "M", "Y", "R", "W",
 ];
 const ALLOWED_BASE: [&str; 5] = ["A", "I", "U", "E", "O"];
+const LTSU: &str = "LTSU";
 
 pub fn parse(input: &str) -> Result<Vec<&str>, Error> {
     if input.is_empty() {
         return Ok(Vec::new());
     }
 
-    let mut opt_token = search_for_token(input);
-    if opt_token.is_none() {
-        return Err(Error::new("invalid sequence"));
-    }
+    let token = match search_for_token(input) {
+        Some(token) => token,
+        None => return Err(Error::new("invalid sequence"))
+    };
 
     let mut tokens: Vec<&str> = Vec::new();
-    let token = opt_token.unwrap();
     tokens.push(token.0);
     let mut remain = token.1;
+    
     while !remain.is_empty() {
-        opt_token = search_for_token(remain);
-        if opt_token.is_none() {
-            return Err(Error::from_remain(remain));
-        }
-
-        let token = opt_token.unwrap();
-        tokens.push(token.0);
-        remain = token.1;
+        match search_for_token(remain) {
+            Some(token) => {
+                tokens.push(token.0);
+                remain = token.1;
+            },
+            None => return Err(Error::from_remain(remain))
+        };
     }
 
     Ok(tokens)
@@ -74,15 +74,18 @@ fn length_one(input: &str) -> Option<(&str, &str)> {
     if ALLOWED_BASE.contains(&token) {
         return Some((token, remain));
     }
+
     if token == "N" {
         if remain.is_empty() {
             return Some((token, remain));
         }
+        // Next char is start of new token
         let r = &remain[..1];
         if ALLOWED_HEAD.contains(&r) {
             return Some((token, remain));
         }
     }
+
     None
 }
 
@@ -96,7 +99,7 @@ fn length_two(input: &str) -> Option<(&str, &str)> {
 
     // "atta" -> あった
     if token.0 == token.1 && ALLOWED_HEAD.contains(&token.0) {
-        return Some(("LTSU", &input[1..]));
+        return Some((LTSU, &input[1..]));
     }
 
     if ALLOWED_HEAD.contains(&token.0) && ALLOWED_BASE.contains(&token.1) {
@@ -133,8 +136,8 @@ fn length_four(input: &str) -> Option<(&str, &str)> {
     let token = &input[..4];
     let remain = &input[4..];
 
-    if token == "LTSU" {
-        return Some(("LTSU", remain));
+    if token == LTSU {
+        return Some((LTSU, remain));
     }
 
     None
