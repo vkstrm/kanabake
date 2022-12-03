@@ -9,6 +9,7 @@ mod parser;
 mod set;
 
 use error::Error;
+use parser::parse;
 use set::CharacterSet;
 use set::KanaType::{Hiragana, Katakana};
 
@@ -148,8 +149,7 @@ fn internal_transform(set: &CharacterSet, uppercase_input: String) -> Result<Str
 }
 
 fn tokenize(input: &str) -> Result<Vec<&str>, Error> {
-    let parser = parser::Parser::new();
-    match parser.parse(input) {
+    match parse(input) {
         Ok(tokens) => Ok(tokens),
         Err(why) => Err(why),
     }

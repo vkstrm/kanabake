@@ -3,152 +3,141 @@ use std::collections::HashMap;
 
 use super::error::Error;
 
-pub struct Parser {
-    allowed_head: Vec<&'static str>,
-    allowed_base: Vec<&'static str>,
-}
+const ALLOWED_HEAD: [&str; 16] = [
+    "K", "G", "S", "Z", "T", "D", "J", "N", "H", "B", "P", "F", "M", "Y", "R", "W",
+];
+const ALLOWED_BASE: [&str; 5] = ["A", "I", "U", "E", "O"];
 
-impl Parser {
-    pub fn new() -> Parser {
-        Parser {
-            allowed_head: vec![
-                "K", "G", "S", "Z", "T", "D", "J", "N", "H", "B", "P", "F", "M", "Y", "R", "W",
-            ],
-            allowed_base: vec!["A", "I", "U", "E", "O"],
-        }
+pub fn parse(input: &str) -> Result<Vec<&str>, Error> {
+    if input.is_empty() {
+        return Ok(Vec::new());
     }
 
-    pub fn parse<'a>(&self, input: &'a str) -> Result<Vec<&'a str>, Error> {
-        if input.is_empty() {
-            return Ok(Vec::new());
-        }
+    let mut opt_token = search_for_token(input);
+    if opt_token.is_none() {
+        return Err(Error::new("invalid sequence"));
+    }
 
-        let mut opt_token = self.search_for_token(input);
+    let mut tokens: Vec<&str> = Vec::new();
+    let token = opt_token.unwrap();
+    tokens.push(token.0);
+    let mut remain = token.1;
+    while !remain.is_empty() {
+        opt_token = search_for_token(remain);
         if opt_token.is_none() {
-            return Err(Error::new("invalid sequence"));
+            return Err(Error::from_remain(remain));
         }
 
-        let mut tokens: Vec<&str> = Vec::new();
         let token = opt_token.unwrap();
         tokens.push(token.0);
-        let mut remain = token.1;
-        while !remain.is_empty() {
-            opt_token = self.search_for_token(remain);
-            if opt_token.is_none() {
-                return Err(Error::from_remain(remain));
-            }
-
-            let token = opt_token.unwrap();
-            tokens.push(token.0);
-            remain = token.1;
-        }
-
-        Ok(tokens)
+        remain = token.1;
     }
 
-    fn search_for_token<'a>(&self, remain: &'a str) -> Option<(&'a str, &'a str)> {
-        let one = self.length_one(remain);
-        if let Some(one) = one {
-            return Some(one);
-        }
+    Ok(tokens)
+}
 
-        let two = self.length_two(remain);
-        if let Some(two) = two {
-            return Some(two);
-        }
-
-        let three = self.length_three(remain);
-        if let Some(three) = three {
-            return Some(three);
-        }
-
-        let four = self.length_four(remain);
-        if let Some(four) = four {
-            return Some(four);
-        }
-
-        None
+fn search_for_token(remain: &str) -> Option<(&str, &str)> {
+    let one = length_one(remain);
+    if let Some(one) = one {
+        return Some(one);
     }
 
-    /**
-     * Search for Tokens of length one.
-     * Return a found token and a splice of remaining input string.
-     */
-    fn length_one<'a>(&self, input: &'a str) -> Option<(&'a str, &'a str)> {
-        if input.is_empty() {
-            return None;
-        }
+    let two = length_two(remain);
+    if let Some(two) = two {
+        return Some(two);
+    }
 
-        let token = &input[..1];
-        let remain = &input[1..];
-        if self.allowed_base.contains(&token) {
+    let three = length_three(remain);
+    if let Some(three) = three {
+        return Some(three);
+    }
+
+    let four = length_four(remain);
+    if let Some(four) = four {
+        return Some(four);
+    }
+
+    None
+}
+
+/**
+ * Search for Tokens of length one.
+ * Return a found token and a splice of remaining input string.
+ */
+fn length_one(input: &str) -> Option<(&str, &str)> {
+    if input.is_empty() {
+        return None;
+    }
+
+    let token = &input[..1];
+    let remain = &input[1..];
+    if ALLOWED_BASE.contains(&token) {
+        return Some((token, remain));
+    }
+    if token == "N" {
+        if remain.is_empty() {
             return Some((token, remain));
         }
-        if token == "N" {
-            if remain.is_empty() {
-                return Some((token, remain));
-            }
-            let r = &remain[..1];
-            if self.allowed_head.contains(&r) {
-                return Some((token, remain));
-            }
+        let r = &remain[..1];
+        if ALLOWED_HEAD.contains(&r) {
+            return Some((token, remain));
         }
-        None
+    }
+    None
+}
+
+fn length_two(input: &str) -> Option<(&str, &str)> {
+    if input.len() < 2 {
+        return None;
     }
 
-    fn length_two<'a>(&self, input: &'a str) -> Option<(&'a str, &'a str)> {
-        if input.len() < 2 {
-            return None;
-        }
+    let token = token_to_tuple(&input[..2], 1);
+    let remain = &input[2..];
 
-        let token = token_to_tuple(&input[..2], 1);
-        let remain = &input[2..];
-
-        // "atta" -> あった
-        if token.0 == token.1 && self.allowed_head.contains(&token.0) {
-            return Some(("LTSU", &input[1..]));
-        }
-
-        if self.allowed_head.contains(&token.0) && self.allowed_base.contains(&token.1) {
-            return Some((&input[..2], remain));
-        }
-        None
+    // "atta" -> あった
+    if token.0 == token.1 && ALLOWED_HEAD.contains(&token.0) {
+        return Some(("LTSU", &input[1..]));
     }
 
-    fn length_three<'a>(&self, input: &'a str) -> Option<(&'a str, &'a str)> {
-        if input.len() < 3 {
-            return None;
-        }
+    if ALLOWED_HEAD.contains(&token.0) && ALLOWED_BASE.contains(&token.1) {
+        return Some((&input[..2], remain));
+    }
+    None
+}
 
-        let token = token_to_tuple(&input[..3], 2);
-        let remain = &input[3..];
-
-        if ALLOWED_MAP.contains_key(token.0)
-            && ALLOWED_MAP
-                .get(token.0)
-                .expect("no token in map")
-                .contains(&token.1)
-        {
-            return Some((&input[..3], remain));
-        }
-
-        None
+fn length_three(input: &str) -> Option<(&str, &str)> {
+    if input.len() < 3 {
+        return None;
     }
 
-    fn length_four<'a>(&self, input: &'a str) -> Option<(&'a str, &'a str)> {
-        if input.len() < 4 {
-            return None;
-        }
+    let token = token_to_tuple(&input[..3], 2);
+    let remain = &input[3..];
 
-        let token = &input[..4];
-        let remain = &input[4..];
-
-        if token == "LTSU" {
-            return Some(("LTSU", remain));
-        }
-
-        None
+    if ALLOWED_MAP.contains_key(token.0)
+        && ALLOWED_MAP
+            .get(token.0)
+            .expect("no token in map")
+            .contains(&token.1)
+    {
+        return Some((&input[..3], remain));
     }
+
+    None
+}
+
+fn length_four(input: &str) -> Option<(&str, &str)> {
+    if input.len() < 4 {
+        return None;
+    }
+
+    let token = &input[..4];
+    let remain = &input[4..];
+
+    if token == "LTSU" {
+        return Some(("LTSU", remain));
+    }
+
+    None
 }
 
 lazy_static! {
