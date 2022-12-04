@@ -5,13 +5,16 @@
 //! either Katakana or Hiragana as output.
 //!
 pub mod error;
+mod kana;
 mod parser;
 mod set;
+mod valid;
 
 use error::Error;
+use kana::KanaType::{Hiragana, Katakana};
 use parser::parse;
 use set::CharacterSet;
-use set::KanaType::{Hiragana, Katakana};
+use valid::is_kana;
 
 /// Transform wapuro romaji string to katakana string.
 ///
@@ -93,15 +96,7 @@ pub fn is_valid(input: &str) -> bool {
 /// assert_eq!(kanabake::is_hiragana("あいうえお"), true);
 /// # }
 pub fn is_hiragana(input: &str) -> bool {
-    let hir_start: u32 = 'ぁ' as u32;
-    let hir_end: u32 = 'ゟ' as u32;
-    for c in input.chars() {
-        let unicode_val = c as u32;
-        if unicode_val < hir_start || unicode_val > hir_end {
-            return false;
-        }
-    }
-    true
+    is_kana(input, Hiragana)
 }
 
 /// Check if all characters in string input are katakana.
@@ -112,15 +107,7 @@ pub fn is_hiragana(input: &str) -> bool {
 /// assert_eq!(kanabake::is_katakana("アイウエオ"), true);
 /// # }
 pub fn is_katakana(input: &str) -> bool {
-    let kat_start: u32 = '゠' as u32;
-    let kat_end: u32 = 'ヿ' as u32;
-    for c in input.chars() {
-        let unicode_val = c as u32;
-        if unicode_val < kat_start || unicode_val > kat_end {
-            return false;
-        }
-    }
-    true
+    is_kana(input, Katakana)
 }
 
 fn validate_input(input: &str) -> Result<String, Error> {

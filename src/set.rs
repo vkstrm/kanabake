@@ -1,10 +1,7 @@
 use lazy_static::lazy_static;
 use std::collections::HashMap;
 
-pub enum KanaType {
-    Hiragana,
-    Katakana,
-}
+use crate::kana::KanaType;
 
 pub struct CharacterSet {
     pub kind: KanaType,

@@ -16,20 +16,20 @@ pub fn parse(input: &str) -> Result<Vec<&str>, Error> {
 
     let token = match search_for_token(input) {
         Some(token) => token,
-        None => return Err(Error::new("invalid sequence"))
+        None => return Err(Error::new("invalid sequence")),
     };
 
     let mut tokens: Vec<&str> = Vec::new();
     tokens.push(token.0);
     let mut remain = token.1;
-    
+
     while !remain.is_empty() {
         match search_for_token(remain) {
             Some(token) => {
                 tokens.push(token.0);
                 remain = token.1;
-            },
-            None => return Err(Error::from_remain(remain))
+            }
+            None => return Err(Error::from_remain(remain)),
         };
     }
 
